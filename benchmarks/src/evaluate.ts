@@ -1,20 +1,94 @@
 import type { LanguageModelV3 } from '@ai-sdk/provider'
 import type { EvaluationResult, Question } from './types.ts'
-import { anthropic } from '@ai-sdk/anthropic'
-import { google } from '@ai-sdk/google'
-import { openai } from '@ai-sdk/openai'
-import { xai } from '@ai-sdk/xai'
+import { randomUUID } from 'node:crypto'
+import process from 'node:process'
+import { createOpenAI } from '@ai-sdk/openai'
 import { generateText } from 'ai'
 import { compareAnswers } from './normalize.ts'
+
+const GIGACHAT_OAUTH_URL = process.env.GIGACHAT_OAUTH_URL ?? 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth'
+const GIGACHAT_BASE_URL = process.env.GIGACHAT_BASE_URL ?? 'https://gigachat.devices.sberbank.ru/api/v1'
+const GIGACHAT_SCOPE = process.env.GIGACHAT_SCOPE ?? 'GIGACHAT_API_PERS'
+const GIGACHAT_MODELS = (process.env.GIGACHAT_MODELS ?? 'GigaChat-2,GigaChat-2-Pro,GigaChat-2-Max')
+  .split(',')
+  .map(model => model.trim())
+  .filter(Boolean)
+
+interface GigaChatTokenResponse {
+  access_token: string
+  expires_at: number
+}
+
+let gigaChatToken: string | undefined
+let gigaChatTokenExpiresAt = 0
+let gigaChatTokenPromise: Promise<string> | undefined
+
+async function fetchGigaChatToken(): Promise<string> {
+  const authKey = process.env.GIGACHAT_AUTH_KEY
+  if (!authKey)
+    throw new Error('GIGACHAT_AUTH_KEY is required to use GigaChat model')
+
+  const response = await fetch(GIGACHAT_OAUTH_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json',
+      'RqUID': randomUUID(),
+      'Authorization': `Basic ${authKey}`,
+    },
+    body: new URLSearchParams({ scope: GIGACHAT_SCOPE }).toString(),
+  })
+
+  if (!response.ok)
+    throw new Error(`Failed to get GigaChat access token: ${response.status} ${response.statusText}`)
+
+  const data = await response.json() as GigaChatTokenResponse
+
+  if (!data.access_token || !data.expires_at)
+    throw new Error('Invalid GigaChat OAuth response: missing access_token or expires_at')
+
+  gigaChatToken = data.access_token
+  gigaChatTokenExpiresAt = data.expires_at
+  return data.access_token
+}
+
+async function getGigaChatToken(): Promise<string> {
+  const now = Date.now()
+  const refreshSkewMs = 60_000
+
+  if (gigaChatToken && now + refreshSkewMs < gigaChatTokenExpiresAt)
+    return gigaChatToken
+
+  if (!gigaChatTokenPromise) {
+    gigaChatTokenPromise = fetchGigaChatToken().finally(() => {
+      gigaChatTokenPromise = undefined
+    })
+  }
+
+  return await gigaChatTokenPromise
+}
+
+const gigachat = createOpenAI({
+  name: 'gigachat',
+  baseURL: GIGACHAT_BASE_URL,
+  fetch: async (input, init) => {
+    const token = await getGigaChatToken()
+    const headers = new Headers(init?.headers)
+    headers.set('Authorization', `Bearer ${token}`)
+    headers.set('Accept', 'application/json')
+
+    return await fetch(input, {
+      ...init,
+      headers,
+    })
+  },
+})
 
 /**
  * Models used for evaluation
  */
 export const models: LanguageModelV3[] = [
-  anthropic('claude-haiku-4-5-20251001'),
-  google('gemini-3-flash-preview'),
-  openai('gpt-5-nano'),
-  xai('grok-4-1-fast-non-reasoning'),
+  ...GIGACHAT_MODELS.map(modelId => gigachat.chat(modelId)),
 ]
 
 /**

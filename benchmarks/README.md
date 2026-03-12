@@ -21,8 +21,11 @@ Measures token count reduction across JSON, XML, YAML, CSV, and TOON:
 
 1. Generate datasets (GitHub repos, analytics, orders)
 2. Convert to all formats (TOON, JSON, XML, YAML, CSV)
-3. Tokenize using `gpt-tokenizer` (`o200k_base` encoding)
+3. Aggregate provider-reported prompt tokens (`inputTokens`) from saved retrieval accuracy results
 4. Calculate savings and generate report
+
+> [!IMPORTANT]
+> Token efficiency now depends on previously saved retrieval accuracy results. Run `pnpm benchmark:accuracy` first for the models you want to compare.
 
 ```bash
 pnpm benchmark:tokens
@@ -38,7 +41,7 @@ Tests how well LLMs can answer questions about data in different formats (TOON, 
 2. Convert each dataset to all supported formats
 3. Query each LLM with formatted data + question
 4. Validate answers deterministically using type-aware comparison (no LLM judge needed)
-5. Aggregate metrics and generate report
+5. Aggregate metrics (including prompt tokens from model responses) and generate report
 
 ### Setup
 

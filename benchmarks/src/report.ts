@@ -1,22 +1,48 @@
 import type { Dataset, EfficiencyRanking, EvaluationResult, FormatResult, Question } from './types.ts'
 import { FORMATTER_DISPLAY_NAMES, QUESTION_TYPE_LABELS, QUESTION_TYPES } from './constants.ts'
 import { ACCURACY_DATASETS } from './datasets.ts'
-import { models, PRIMERS } from './evaluate.ts'
+import { models } from './evaluate.ts'
 import { supportsCSV } from './formatters.ts'
 import { generateQuestions } from './questions/index.ts'
-import { createProgressBar, tokenize } from './utils.ts'
+import { createProgressBar } from './utils.ts'
 
 const EFFICIENCY_CHART_STYLE: 'vertical' | 'horizontal' = 'horizontal'
 
 /**
- * Calculate token counts for all format+dataset combinations
+ * Calculate token counts for all format+dataset combinations from model-reported prompt tokens.
  *
  * @remarks
- * Includes primer tokens for fairer comparison across formats
+ * Uses `inputTokens` from provider responses (prompt_tokens equivalent).
  */
 export function calculateTokenCounts(
-  formatters: Record<string, (data: unknown) => string>,
+  results: EvaluationResult[],
 ): Record<string, number> {
+  const tokenCounts: Record<string, number> = {}
+  const tokenSums: Record<string, number> = {}
+  const tokenSampleCounts: Record<string, number> = {}
+  const questions = generateQuestions()
+  const questionDatasetMap = new Map(questions.map(q => [q.id, q.dataset]))
+
+  for (const result of results) {
+    if (typeof result.inputTokens !== 'number')
+      continue
+
+    const datasetName = questionDatasetMap.get(result.questionId)
+    if (!datasetName)
+      continue
+
+    const key = `${result.format}-${datasetName}`
+    tokenSums[key] = (tokenSums[key] ?? 0) + result.inputTokens
+    tokenSampleCounts[key] = (tokenSampleCounts[key] ?? 0) + 1
+  }
+
+  for (const [key, sum] of Object.entries(tokenSums)) {
+    const count = tokenSampleCounts[key] ?? 1
+    tokenCounts[key] = Math.round(sum / count)
+  }
+
+  /*
+  // Legacy local tokenizer approach (kept for reference):
   const tokenCounts: Record<string, number> = {}
 
   for (const [formatName, formatter] of Object.entries(formatters)) {
@@ -33,6 +59,7 @@ export function calculateTokenCounts(
       tokenCounts[key] = tokenize(fullPrompt)
     }
   }
+  */
 
   return tokenCounts
 }
@@ -55,7 +82,9 @@ export function calculateFormatResults(
     // Calculate average tokens across all datasets for this format
     const formatTokenEntries = Object.entries(tokenCounts)
       .filter(([key]) => key.startsWith(`${formatName}-`))
-    const avgTokens = formatTokenEntries.reduce((sum, [, tokens]) => sum + tokens, 0) / formatTokenEntries.length
+    const avgTokens = formatTokenEntries.length > 0
+      ? formatTokenEntries.reduce((sum, [, tokens]) => sum + tokens, 0) / formatTokenEntries.length
+      : (formatResults.reduce((sum, r) => sum + (r.inputTokens ?? 0), 0) / Math.max(formatResults.filter(r => typeof r.inputTokens === 'number').length, 1))
 
     const averageLatency = formatResults.reduce((sum, r) => sum + r.latencyMs, 0) / totalCount
 
@@ -342,7 +371,7 @@ ${totalQuestions} questions are generated dynamically across five categories:
 #### Models & Configuration
 
 - **Models tested**: ${modelNames.map(m => `\`${m}\``).join(', ')}
-- **Token counting**: Using \`gpt-tokenizer\` with \`o200k_base\` encoding (GPT-5 tokenizer)
+- **Token counting**: Using provider-reported prompt tokens (\`inputTokens\`) from model responses
 - **Temperature**: Not set (models use their defaults)
 - **Total evaluations**: ${totalQuestions} questions × ${formatCount} formats × ${modelNames.length} models = ${totalEvaluations.toLocaleString('en-US')} LLM calls
 `.trim()

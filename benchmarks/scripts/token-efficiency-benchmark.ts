@@ -6,7 +6,9 @@ import { encode } from '../../packages/toon/src/index.ts'
 import { BENCHMARKS_DIR, FORMATTER_DISPLAY_NAMES, ROOT_DIR } from '../src/constants.ts'
 import { TOKEN_EFFICIENCY_DATASETS } from '../src/datasets.ts'
 import { formatters, supportsCSV } from '../src/formatters.ts'
-import { createProgressBar, ensureDir, tokenize } from '../src/utils.ts'
+import { generateQuestions } from '../src/questions/index.ts'
+import { getAllModelResults } from '../src/storage.ts'
+import { createProgressBar, ensureDir } from '../src/utils.ts'
 
 interface FormatMetrics {
   name: string
@@ -158,6 +160,32 @@ function generateDatasetChart(result: BenchmarkResult): string {
 
 const results: BenchmarkResult[] = []
 
+const allModelResults = await getAllModelResults()
+const allResults = Object.values(allModelResults).flat()
+
+if (allResults.length === 0) {
+  prompts.log.error('No accuracy results found. Run `npm run benchmark:accuracy` first to collect prompt token usage.')
+  process.exit(1)
+}
+
+const questionDatasetMap = new Map(generateQuestions().map(question => [question.id, question.dataset]))
+
+const tokenSumsByFormatDataset: Record<string, number> = {}
+const tokenCountsByFormatDataset: Record<string, number> = {}
+
+for (const result of allResults) {
+  if (typeof result.inputTokens !== 'number')
+    continue
+
+  const datasetName = questionDatasetMap.get(result.questionId)
+  if (!datasetName)
+    continue
+
+  const key = `${result.format}-${datasetName}`
+  tokenSumsByFormatDataset[key] = (tokenSumsByFormatDataset[key] ?? 0) + result.inputTokens
+  tokenCountsByFormatDataset[key] = (tokenCountsByFormatDataset[key] ?? 0) + 1
+}
+
 // Calculate token counts for all datasets
 for (const dataset of TOKEN_EFFICIENCY_DATASETS) {
   const formatMetrics: FormatMetrics[] = []
@@ -169,8 +197,22 @@ for (const dataset of TOKEN_EFFICIENCY_DATASETS) {
     if (formatName === 'csv' && !supportsCSV(dataset))
       continue
 
+    const key = `${formatName}-${dataset.name}`
+    const sum = tokenSumsByFormatDataset[key]
+    const count = tokenCountsByFormatDataset[key]
+    const tokens = sum && count ? Math.round(sum / count) : undefined
+
+    if (tokens === undefined) {
+      prompts.log.error(`Missing prompt token stats for ${formatName} on dataset ${dataset.name}. Run full accuracy benchmark for selected models first.`)
+      process.exit(1)
+    }
+
+    /*
+    // Legacy local tokenizer approach (kept for reference):
     const formattedData = formatter(dataset.data)
     const tokens = tokenize(formattedData)
+    */
+
     tokensByFormat[formatName] = tokens
   }
 

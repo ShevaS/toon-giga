@@ -1,4 +1,4 @@
-Benchmarks test LLM comprehension across different input formats using 209 data retrieval questions on 4 models.
+Benchmarks test LLM comprehension across different input formats using 209 data retrieval questions on 1 model.
 
 <details>
 <summary><strong>Show Dataset Catalog</strong></summary>
@@ -36,73 +36,49 @@ Benchmarks test LLM comprehension across different input formats using 209 data 
 Each format ranked by efficiency (accuracy percentage per 1,000 tokens):
 
 ```
-TOON           ████████████████████   27.7 acc%/1K tok  │  76.4% acc  │  2,759 tokens
-JSON compact   █████████████████░░░   23.7 acc%/1K tok  │  73.7% acc  │  3,104 tokens
-YAML           ██████████████░░░░░░   19.9 acc%/1K tok  │  74.5% acc  │  3,749 tokens
-JSON           ████████████░░░░░░░░   16.4 acc%/1K tok  │  75.0% acc  │  4,587 tokens
-XML            ██████████░░░░░░░░░░   13.8 acc%/1K tok  │  72.1% acc  │  5,221 tokens
+TOON           ████████████████████   27.8 acc%/1K tok  │  76.7% acc  │  2,759 tokens
+JSON compact   █████████████████░░░   23.8 acc%/1K tok  │  74.0% acc  │  3,104 tokens
+YAML           ██████████████░░░░░░   20.0 acc%/1K tok  │  74.8% acc  │  3,749 tokens
+JSON           ████████████░░░░░░░░   16.4 acc%/1K tok  │  75.2% acc  │  4,587 tokens
+XML            ██████████░░░░░░░░░░   13.9 acc%/1K tok  │  72.3% acc  │  5,221 tokens
 ```
 
 *Efficiency score = (Accuracy % ÷ Tokens) × 1,000. Higher is better.*
 
 > [!TIP]
-> TOON achieves **76.4%** accuracy (vs JSON's 75.0%) while using **39.9% fewer tokens**.
+> TOON achieves **76.7%** accuracy (vs JSON's 75.2%) while using **39.9% fewer tokens**.
 
-**Note on CSV:** Excluded from ranking as it only supports 109 of 209 questions (flat tabular data only). While CSV is highly token-efficient for simple tabular data, it cannot represent nested structures that other formats handle.
+**Note on CSV:** Excluded from ranking as it only supports 446 of 209 questions (flat tabular data only). While CSV is highly token-efficient for simple tabular data, it cannot represent nested structures that other formats handle.
 
 #### Per-Model Accuracy
 
-Accuracy across 4 LLMs on 209 data retrieval questions:
+Accuracy across 1 LLM on 209 data retrieval questions:
 
 ```
-claude-haiku-4-5-20251001
-→ TOON           ████████████░░░░░░░░    59.8% (125/209)
-  JSON           ███████████░░░░░░░░░    57.4% (120/209)
-  YAML           ███████████░░░░░░░░░    56.0% (117/209)
-  XML            ███████████░░░░░░░░░    55.5% (116/209)
-  JSON compact   ███████████░░░░░░░░░    55.0% (115/209)
-  CSV            ██████████░░░░░░░░░░    50.5% (55/109)
-
-gemini-3-flash-preview
-  XML            ████████████████████    98.1% (205/209)
-  JSON           ███████████████████░    97.1% (203/209)
-  YAML           ███████████████████░    97.1% (203/209)
-→ TOON           ███████████████████░    96.7% (202/209)
-  JSON compact   ███████████████████░    96.7% (202/209)
-  CSV            ███████████████████░    96.3% (105/109)
-
-gpt-5-nano
-→ TOON           ██████████████████░░    90.9% (190/209)
-  JSON compact   ██████████████████░░    90.9% (190/209)
-  JSON           ██████████████████░░    89.0% (186/209)
-  CSV            ██████████████████░░    89.0% (97/109)
-  YAML           █████████████████░░░    87.1% (182/209)
-  XML            ████████████████░░░░    80.9% (169/209)
-
-grok-4-1-fast-non-reasoning
-→ TOON           ████████████░░░░░░░░    58.4% (122/209)
-  YAML           ████████████░░░░░░░░    57.9% (121/209)
-  JSON           ███████████░░░░░░░░░    56.5% (118/209)
-  XML            ███████████░░░░░░░░░    54.1% (113/209)
-  JSON compact   ██████████░░░░░░░░░░    52.2% (109/209)
-  CSV            ██████████░░░░░░░░░░    51.4% (56/109)
+GigaChat
+→ TOON           ████████████████████   100.0% (10/10)
+  YAML           ████████████████████   100.0% (10/10)
+  JSON compact   ████████████████████   100.0% (10/10)
+  CSV            ████████████████████   100.0% (10/10)
+  JSON           ██████████████████░░    90.0% (9/10)
+  XML            ██████████████████░░    90.0% (9/10)
 ```
 
 > [!TIP]
-> TOON achieves **76.4% accuracy** (vs JSON's 75.0%) while using **39.9% fewer tokens** on these datasets.
+> TOON achieves **76.7% accuracy** (vs JSON's 75.2%) while using **39.9% fewer tokens** on these datasets.
 
 <details>
 <summary><strong>Performance by dataset, model, and question type</strong></summary>
 
 #### Performance by Question Type
 
-| Question Type | TOON | JSON | YAML | JSON compact | XML | CSV |
+| Question Type | TOON | JSON | YAML | JSON compact | CSV | XML |
 | ------------- | ---- | ---- | ---- | ---- | ---- | ---- |
-| Field Retrieval | 99.6% | 99.3% | 98.5% | 98.5% | 98.9% | 100.0% |
-| Aggregation | 61.9% | 61.9% | 59.9% | 58.3% | 54.4% | 50.9% |
-| Filtering | 56.8% | 53.1% | 56.3% | 55.2% | 51.6% | 50.9% |
-| Structure Awareness | 89.0% | 87.0% | 84.0% | 84.0% | 81.0% | 85.9% |
-| Structural Validation | 70.0% | 60.0% | 60.0% | 55.0% | 85.0% | 80.0% |
+| Field Retrieval | 99.6% | 98.9% | 98.6% | 98.6% | 100.0% | 98.6% |
+| Aggregation | 61.9% | 61.9% | 59.9% | 58.3% | 50.9% | 54.4% |
+| Filtering | 56.8% | 53.1% | 56.3% | 55.2% | 50.9% | 51.6% |
+| Structure Awareness | 89.0% | 87.0% | 84.0% | 84.0% | 85.9% | 81.0% |
+| Structural Validation | 70.0% | 60.0% | 60.0% | 55.0% | 80.0% | 85.0% |
 
 #### Performance by Dataset
 
@@ -110,12 +86,12 @@ grok-4-1-fast-non-reasoning
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `csv` | 73.2% | 2,334 | 120/164 |
-| `toon` | 73.2% | 2,498 | 120/164 |
-| `json-compact` | 73.8% | 3,924 | 121/164 |
-| `yaml` | 73.8% | 4,959 | 121/164 |
-| `json-pretty` | 73.8% | 6,331 | 121/164 |
-| `xml` | 74.4% | 7,296 | 122/164 |
+| `csv` | 74.7% | 2,334 | 130/174 |
+| `toon` | 74.7% | 2,498 | 130/174 |
+| `json-compact` | 75.3% | 3,924 | 131/174 |
+| `yaml` | 75.3% | 4,959 | 131/174 |
+| `json-pretty` | 74.7% | 6,331 | 130/174 |
+| `xml` | 75.3% | 7,296 | 131/174 |
 
 ##### E-commerce orders with nested structures
 
@@ -226,49 +202,16 @@ grok-4-1-fast-non-reasoning
 
 #### Performance by Model
 
-##### claude-haiku-4-5-20251001
+##### GigaChat
 
 | Format | Accuracy | Correct/Total |
 | ------ | -------- | ------------- |
-| `toon` | 59.8% | 125/209 |
-| `json-pretty` | 57.4% | 120/209 |
-| `yaml` | 56.0% | 117/209 |
-| `xml` | 55.5% | 116/209 |
-| `json-compact` | 55.0% | 115/209 |
-| `csv` | 50.5% | 55/109 |
-
-##### gemini-3-flash-preview
-
-| Format | Accuracy | Correct/Total |
-| ------ | -------- | ------------- |
-| `xml` | 98.1% | 205/209 |
-| `json-pretty` | 97.1% | 203/209 |
-| `yaml` | 97.1% | 203/209 |
-| `toon` | 96.7% | 202/209 |
-| `json-compact` | 96.7% | 202/209 |
-| `csv` | 96.3% | 105/109 |
-
-##### gpt-5-nano
-
-| Format | Accuracy | Correct/Total |
-| ------ | -------- | ------------- |
-| `toon` | 90.9% | 190/209 |
-| `json-compact` | 90.9% | 190/209 |
-| `json-pretty` | 89.0% | 186/209 |
-| `csv` | 89.0% | 97/109 |
-| `yaml` | 87.1% | 182/209 |
-| `xml` | 80.9% | 169/209 |
-
-##### grok-4-1-fast-non-reasoning
-
-| Format | Accuracy | Correct/Total |
-| ------ | -------- | ------------- |
-| `toon` | 58.4% | 122/209 |
-| `yaml` | 57.9% | 121/209 |
-| `json-pretty` | 56.5% | 118/209 |
-| `xml` | 54.1% | 113/209 |
-| `json-compact` | 52.2% | 109/209 |
-| `csv` | 51.4% | 56/109 |
+| `toon` | 100.0% | 10/10 |
+| `yaml` | 100.0% | 10/10 |
+| `json-compact` | 100.0% | 10/10 |
+| `csv` | 100.0% | 10/10 |
+| `json-pretty` | 90.0% | 9/10 |
+| `xml` | 90.0% | 9/10 |
 
 </details>
 
@@ -327,13 +270,13 @@ Eleven datasets designed to test different structural patterns and validation ca
 
 #### Evaluation Process
 
-1. **Format conversion**: Each dataset is converted to all 6 formats (TOON, JSON, YAML, JSON compact, XML, CSV).
+1. **Format conversion**: Each dataset is converted to all 6 formats (TOON, JSON, YAML, JSON compact, CSV, XML).
 2. **Query LLM**: Each model receives formatted data + question in a prompt and extracts the answer.
 3. **Validate deterministically**: Answers are validated using type-aware comparison (e.g., `50000` = `$50,000`, `Engineering` = `engineering`, `2025-01-01` = `January 1, 2025`) without requiring an LLM judge.
 
 #### Models & Configuration
 
-- **Models tested**: `claude-haiku-4-5-20251001`, `gemini-3-flash-preview`, `gpt-5-nano`, `grok-4-1-fast-non-reasoning`
+- **Models tested**: `GigaChat`
 - **Token counting**: Using `gpt-tokenizer` with `o200k_base` encoding (GPT-5 tokenizer)
 - **Temperature**: Not set (models use their defaults)
-- **Total evaluations**: 209 questions × 6 formats × 4 models = 5,016 LLM calls
+- **Total evaluations**: 209 questions × 6 formats × 1 models = 1,254 LLM calls

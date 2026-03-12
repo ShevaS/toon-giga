@@ -350,7 +350,7 @@ Eleven datasets designed to test different structural patterns and validation ca
 #### Models & Configuration
 
 - **Models tested**: `claude-haiku-4-5-20251001`, `gemini-3-flash-preview`, `gpt-5-nano`, `grok-4-1-fast-non-reasoning`
-- **Token counting**: Using `gpt-tokenizer` with `o200k_base` encoding (GPT-5 tokenizer)
+- **Token counting**: Using provider-reported prompt tokens (`inputTokens`) from model responses
 - **Temperature**: Not set (models use their defaults)
 - **Total evaluations**: 209 questions × 6 formats × 4 models = 5,016 LLM calls
 
@@ -358,7 +358,7 @@ Eleven datasets designed to test different structural patterns and validation ca
 
 ## Token Efficiency
 
-Token counts are measured using the GPT-5 `o200k_base` tokenizer via [`gpt-tokenizer`](https://github.com/niieani/gpt-tokenizer). Savings are calculated against formatted JSON (2-space indentation) as the primary baseline, with additional comparisons to compact JSON (minified), YAML, and XML. Actual savings vary by model and tokenizer.
+Token counts are measured from provider-reported prompt tokens (`inputTokens`) collected during retrieval-accuracy runs. Savings are calculated against formatted JSON (2-space indentation) as the primary baseline, with additional comparisons to compact JSON (minified), YAML, and XML. Actual savings vary by model.
 
 The benchmarks test datasets across different structural patterns (uniform, semi-uniform, nested, deeply nested) to show where TOON excels and where other formats may be better.
 

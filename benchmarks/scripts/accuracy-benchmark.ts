@@ -10,7 +10,7 @@ import { evaluateQuestion, models } from '../src/evaluate.ts'
 import { formatters, supportsCSV } from '../src/formatters.ts'
 import { generateQuestions } from '../src/questions/index.ts'
 import { calculateFormatResults, calculateTokenCounts, generateAccuracyReport } from '../src/report.ts'
-import { getAllModelResults, hasModelResults, saveModelResults } from '../src/storage.ts'
+import { hasModelResults, loadModelResults, saveModelResults } from '../src/storage.ts'
 import { ensureDir } from '../src/utils.ts'
 
 // Constants
@@ -88,11 +88,13 @@ const modelChoices = models.map(({ modelId }) => ({
   label: modelId,
 }))
 
-const selectedModels = await prompts.multiselect({
-  message: 'Select models to benchmark (Space to select, Enter to confirm)',
-  options: modelChoices,
-  required: true,
-})
+const selectedModels = process.env.BENCHMARK_AUTO_SELECT_ALL_MODELS === 'true'
+  ? modelChoices.map(choice => choice.value)
+  : await prompts.multiselect({
+      message: 'Select models to benchmark (Space to select, Enter to confirm)',
+      options: modelChoices,
+      required: true,
+    })
 
 if (prompts.isCancel(selectedModels)) {
   prompts.cancel('Benchmark cancelled')
@@ -184,16 +186,22 @@ for (const model of activeModels) {
 const reportSpinner = prompts.spinner()
 reportSpinner.start('Generating report from all model results')
 
-// Load all available model results (including any that were skipped)
-const allModelResults = await getAllModelResults()
-const allResults = Object.values(allModelResults).flat()
+// Load results only for currently selected models
+const activeModelIds = new Set(activeModels.map(model => model.modelId))
+const allResults = (
+  await Promise.all(
+    Array.from(activeModelIds, async (modelId) => {
+      return await loadModelResults(modelId) ?? []
+    }),
+  )
+).flat()
 
 if (allResults.length === 0) {
   prompts.log.warn('No results available to generate report')
   process.exit(0)
 }
 
-const tokenCounts = calculateTokenCounts(formatters)
+const tokenCounts = calculateTokenCounts(allResults)
 const formatResults = calculateFormatResults(allResults, tokenCounts)
 const accuracyReport = generateAccuracyReport(allResults, formatResults, tokenCounts)
 

@@ -31,10 +31,12 @@ export const DRY_RUN_LIMITS = {
  * @remarks
  * Set `undefined` for models without specific limits.
  */
-/// keep-sorted
 export const MODEL_RPM_LIMITS: Record<string, number | undefined> = {
   'claude-haiku-4-5-20251001': 50,
   'gemini-3-flash-preview': 25,
+  'GigaChat-2-Max': 1,
+  'GigaChat-2-Pro': 1,
+  'GigaChat-2': 1,
   'gpt-5-nano': 50,
   'grok-4-1-fast-non-reasoning': 25,
 }
