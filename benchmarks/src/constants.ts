@@ -7,7 +7,7 @@ export const BENCHMARKS_DIR: string = url.fileURLToPath(new URL('../', import.me
 /**
  * Default concurrency for parallel evaluations to prevent bursting
  */
-export const DEFAULT_CONCURRENCY = 10
+export const DEFAULT_CONCURRENCY = 1
 
 /**
  * Enable dry run mode for quick testing with limited AI requests
@@ -22,7 +22,7 @@ export const DRY_RUN: boolean = process.env.DRY_RUN === 'true'
  */
 export const DRY_RUN_LIMITS = {
   /** Maximum number of questions to evaluate */
-  maxQuestions: 2,
+  maxQuestions: 20,
 }
 
 /**

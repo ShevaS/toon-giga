@@ -17,7 +17,7 @@ import { ensureDir } from '../src/utils.ts'
 
 // Constants
 const PROGRESS_UPDATE_INTERVAL = 10
-const RATE_LIMIT_INTERVAL_MS = 60_000
+const RATE_LIMIT_INTERVAL_MS = 1_000
 const execFileAsync = promisify(execFile)
 
 prompts.intro('Retrieval Accuracy Benchmark')
