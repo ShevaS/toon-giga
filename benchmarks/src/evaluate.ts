@@ -2,7 +2,10 @@ import type { LanguageModelV3 } from '@ai-sdk/provider'
 import type { EvaluationResult, Question } from './types.ts'
 import { randomUUID } from 'node:crypto'
 import process from 'node:process'
+import { createAnthropic } from '@ai-sdk/anthropic'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenAI } from '@ai-sdk/openai'
+import { createXai } from '@ai-sdk/xai'
 import { generateText } from 'ai'
 import { compareAnswers } from './normalize.ts'
 
@@ -13,6 +16,11 @@ const GIGACHAT_MODELS = (process.env.GIGACHAT_MODELS ?? 'GigaChat-2,GigaChat-2-P
   .split(',')
   .map(model => model.trim())
   .filter(Boolean)
+
+const anthropic = createAnthropic()
+const google = createGoogleGenerativeAI()
+const openai = createOpenAI()
+const xai = createXai()
 
 interface GigaChatTokenResponse {
   access_token: string
@@ -88,6 +96,10 @@ const gigachat = createOpenAI({
  * Models used for evaluation
  */
 export const models: LanguageModelV3[] = [
+  anthropic('claude-haiku-4-5-20251001'),
+  google('gemini-3-flash-preview'),
+  openai('gpt-5-nano'),
+  xai('grok-4-1-fast-non-reasoning'),
   ...GIGACHAT_MODELS.map(modelId => gigachat.chat(modelId)),
 ]
 

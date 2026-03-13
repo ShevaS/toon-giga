@@ -1,4 +1,4 @@
-Benchmarks test LLM comprehension across different input formats using 209 data retrieval questions on 1 model.
+Benchmarks test LLM comprehension across different input formats using 209 data retrieval questions on 5 models.
 
 <details>
 <summary><strong>Show Dataset Catalog</strong></summary>
@@ -36,25 +36,57 @@ Benchmarks test LLM comprehension across different input formats using 209 data 
 Each format ranked by efficiency (accuracy percentage per 1,000 tokens):
 
 ```
-TOON           ████████████████████   30.8 acc%/1K tok  │  43.1% acc  │  1,396 tokens
-JSON compact   ██████████████████░░   28.1 acc%/1K tok  │  41.1% acc  │  1,464 tokens
-YAML           ███████████████░░░░░   23.6 acc%/1K tok  │  38.8% acc  │  1,639 tokens
-JSON           █████████████░░░░░░░   19.8 acc%/1K tok  │  39.2% acc  │  1,986 tokens
-XML            ███████████░░░░░░░░░   17.6 acc%/1K tok  │  34.4% acc  │  1,952 tokens
+TOON           ████████████████████   24.9 acc%/1K tok  │  69.8% acc  │  2,803 tokens
+JSON compact   █████████████████░░░   21.7 acc%/1K tok  │  67.2% acc  │  3,095 tokens
+YAML           ███████████████░░░░░   18.4 acc%/1K tok  │  67.4% acc  │  3,667 tokens
+JSON           ████████████░░░░░░░░   14.8 acc%/1K tok  │  67.8% acc  │  4,579 tokens
+XML            ██████████░░░░░░░░░░   12.6 acc%/1K tok  │  64.6% acc  │  5,131 tokens
 ```
 
 *Efficiency score = (Accuracy % ÷ Tokens) × 1,000. Higher is better.*
 
 > [!TIP]
-> TOON achieves **43.1%** accuracy (vs JSON's 39.2%) while using **29.7% fewer tokens**.
+> TOON achieves **69.8%** accuracy (vs JSON's 67.8%) while using **38.8% fewer tokens**.
 
 **Note on CSV:** Excluded from ranking as it only supports 109 of 209 questions (flat tabular data only). While CSV is highly token-efficient for simple tabular data, it cannot represent nested structures that other formats handle.
 
 #### Per-Model Accuracy
 
-Accuracy across 1 LLM on 209 data retrieval questions:
+Accuracy across 5 LLMs on 209 data retrieval questions:
 
 ```
+claude-haiku-4-5-20251001
+→ TOON           ████████████░░░░░░░░    59.8% (125/209)
+  JSON           ███████████░░░░░░░░░    57.4% (120/209)
+  YAML           ███████████░░░░░░░░░    56.0% (117/209)
+  XML            ███████████░░░░░░░░░    55.5% (116/209)
+  JSON compact   ███████████░░░░░░░░░    55.0% (115/209)
+  CSV            ██████████░░░░░░░░░░    50.5% (55/109)
+
+gemini-3-flash-preview
+  XML            ████████████████████    98.1% (205/209)
+  JSON           ███████████████████░    97.1% (203/209)
+  YAML           ███████████████████░    97.1% (203/209)
+→ TOON           ███████████████████░    96.7% (202/209)
+  JSON compact   ███████████████████░    96.7% (202/209)
+  CSV            ███████████████████░    96.3% (105/109)
+
+gpt-5-nano
+→ TOON           ██████████████████░░    90.9% (190/209)
+  JSON compact   ██████████████████░░    90.9% (190/209)
+  JSON           ██████████████████░░    89.0% (186/209)
+  CSV            ██████████████████░░    89.0% (97/109)
+  YAML           █████████████████░░░    87.1% (182/209)
+  XML            ████████████████░░░░    80.9% (169/209)
+
+grok-4-1-fast-non-reasoning
+→ TOON           ████████████░░░░░░░░    58.4% (122/209)
+  YAML           ████████████░░░░░░░░    57.9% (121/209)
+  JSON           ███████████░░░░░░░░░    56.5% (118/209)
+  XML            ███████████░░░░░░░░░    54.1% (113/209)
+  JSON compact   ██████████░░░░░░░░░░    52.2% (109/209)
+  CSV            ██████████░░░░░░░░░░    51.4% (56/109)
+
 GigaChat-2
 → TOON           █████████░░░░░░░░░░░    43.1% (90/209)
   JSON compact   ████████░░░░░░░░░░░░    41.1% (86/209)
@@ -65,20 +97,20 @@ GigaChat-2
 ```
 
 > [!TIP]
-> TOON achieves **43.1% accuracy** (vs JSON's 39.2%) while using **29.7% fewer tokens** on these datasets.
+> TOON achieves **69.8% accuracy** (vs JSON's 67.8%) while using **38.8% fewer tokens** on these datasets.
 
 <details>
 <summary><strong>Performance by dataset, model, and question type</strong></summary>
 
 #### Performance by Question Type
 
-| Question Type | TOON | JSON compact | JSON | YAML | CSV | XML |
+| Question Type | TOON | JSON | YAML | JSON compact | CSV | XML |
 | ------------- | ---- | ---- | ---- | ---- | ---- | ---- |
-| Field Retrieval | 85.3% | 88.2% | 83.8% | 82.4% | 87.5% | 79.4% |
-| Aggregation | 20.6% | 14.3% | 15.9% | 15.9% | 6.9% | 9.5% |
-| Filtering | 6.3% | 2.1% | 0.0% | 0.0% | 0.0% | 0.0% |
-| Structure Awareness | 60.0% | 60.0% | 56.0% | 56.0% | 56.3% | 44.0% |
-| Structural Validation | 20.0% | 20.0% | 20.0% | 20.0% | 20.0% | 20.0% |
+| Field Retrieval | 96.8% | 96.2% | 95.3% | 96.5% | 97.5% | 95.0% |
+| Aggregation | 53.7% | 52.7% | 51.1% | 49.5% | 42.1% | 45.4% |
+| Filtering | 46.7% | 42.5% | 45.0% | 44.6% | 40.7% | 41.3% |
+| Structure Awareness | 83.2% | 80.8% | 78.4% | 79.2% | 80.0% | 73.6% |
+| Structural Validation | 60.0% | 52.0% | 52.0% | 48.0% | 68.0% | 72.0% |
 
 #### Performance by Dataset
 
@@ -86,121 +118,165 @@ GigaChat-2
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `csv` | 43.9% | 1,112 | 18/41 |
-| `toon` | 39.0% | 1,173 | 16/41 |
-| `json-compact` | 43.9% | 1,580 | 18/41 |
-| `yaml` | 41.5% | 1,635 | 17/41 |
-| `json-pretty` | 43.9% | 1,946 | 18/41 |
-| `xml` | 39.0% | 1,803 | 16/41 |
+| `csv` | 67.3% | 2,465 | 138/205 |
+| `toon` | 66.3% | 2,591 | 136/205 |
+| `json-compact` | 67.8% | 3,865 | 139/205 |
+| `yaml` | 67.3% | 4,727 | 138/205 |
+| `json-pretty` | 67.8% | 6,230 | 139/205 |
+| `xml` | 67.3% | 7,051 | 138/205 |
 
 ##### E-commerce orders with nested structures
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `toon` | 46.3% | 2,854 | 19/41 |
-| `json-compact` | 41.5% | 2,668 | 17/41 |
-| `yaml` | 39.0% | 2,995 | 16/41 |
-| `json-pretty` | 36.6% | 3,406 | 15/41 |
-| `xml` | 29.3% | 3,501 | 12/41 |
+| `toon` | 75.1% | 7,116 | 154/205 |
+| `json-compact` | 71.2% | 6,757 | 146/205 |
+| `yaml` | 71.7% | 8,093 | 147/205 |
+| `json-pretty` | 70.7% | 10,667 | 145/205 |
+| `xml` | 67.8% | 11,833 | 139/205 |
 
 ##### Time-series analytics data
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `json-compact` | 36.7% | 1,107 | 11/30 |
-| `toon` | 33.3% | 1,016 | 10/30 |
-| `csv` | 30.0% | 964 | 9/30 |
-| `json-pretty` | 33.3% | 1,505 | 10/30 |
-| `yaml` | 30.0% | 1,490 | 9/30 |
-| `xml` | 30.0% | 1,863 | 9/30 |
+| `toon` | 69.3% | 1,686 | 104/150 |
+| `csv` | 66.0% | 1,608 | 99/150 |
+| `json-compact` | 66.7% | 2,331 | 100/150 |
+| `yaml` | 66.7% | 2,959 | 100/150 |
+| `json-pretty` | 66.7% | 3,630 | 100/150 |
+| `xml` | 64.0% | 4,241 | 96/150 |
 
 ##### Top 100 GitHub repositories
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `json-compact` | 42.4% | 4,437 | 14/33 |
-| `yaml` | 39.4% | 4,486 | 13/33 |
-| `csv` | 36.4% | 3,888 | 12/33 |
-| `json-pretty` | 39.4% | 4,763 | 13/33 |
-| `toon` | 33.3% | 3,499 | 11/33 |
-| `xml` | 36.4% | 4,830 | 12/33 |
+| `csv` | 60.0% | 8,530 | 99/165 |
+| `toon` | 60.0% | 8,620 | 99/165 |
+| `json-compact` | 56.4% | 11,061 | 93/165 |
+| `yaml` | 60.0% | 12,542 | 99/165 |
+| `json-pretty` | 58.8% | 14,569 | 97/165 |
+| `xml` | 52.1% | 16,210 | 86/165 |
 
 ##### Semi-uniform event logs
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `toon` | 40.0% | 2,047 | 12/30 |
-| `json-compact` | 33.3% | 1,823 | 10/30 |
-| `yaml` | 30.0% | 2,175 | 9/30 |
-| `json-pretty` | 30.0% | 2,570 | 9/30 |
-| `xml` | 26.7% | 2,926 | 8/30 |
+| `json-compact` | 61.3% | 4,571 | 92/150 |
+| `toon` | 60.0% | 5,459 | 90/150 |
+| `json-pretty` | 61.3% | 6,581 | 92/150 |
+| `yaml` | 55.3% | 5,471 | 83/150 |
+| `xml` | 52.0% | 7,382 | 78/150 |
 
 ##### Deeply nested configuration
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `toon` | 72.4% | 286 | 21/29 |
-| `yaml` | 55.2% | 301 | 16/29 |
-| `json-compact` | 51.7% | 289 | 15/29 |
-| `json-pretty` | 55.2% | 395 | 16/29 |
-| `xml` | 48.3% | 357 | 14/29 |
+| `toon` | 90.3% | 752 | 131/145 |
+| `json-compact` | 82.8% | 651 | 120/145 |
+| `yaml` | 85.5% | 764 | 124/145 |
+| `json-pretty` | 84.8% | 1,023 | 123/145 |
+| `xml` | 82.8% | 1,073 | 120/145 |
 
 ##### Valid complete dataset (control)
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `csv` | 100.0% | 682 | 1/1 |
-| `toon` | 100.0% | 714 | 1/1 |
-| `json-compact` | 100.0% | 1,012 | 1/1 |
-| `yaml` | 100.0% | 1,190 | 1/1 |
-| `json-pretty` | 100.0% | 1,475 | 1/1 |
-| `xml` | 100.0% | 1,663 | 1/1 |
+| `toon` | 100.0% | 735 | 5/5 |
+| `json-compact` | 100.0% | 1,005 | 5/5 |
+| `yaml` | 100.0% | 1,204 | 5/5 |
+| `json-pretty` | 100.0% | 1,548 | 5/5 |
+| `xml` | 40.0% | 1,761 | 2/5 |
+| `csv` | 20.0% | 687 | 1/5 |
 
 ##### Array truncated: 3 rows removed from end
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `toon` | 0.0% | 617 | 0/1 |
-| `json-compact` | 0.0% | 92 | 0/1 |
-| `json-pretty` | 0.0% | 1,261 | 0/1 |
-| `yaml` | 0.0% | 91 | 0/1 |
-| `csv` | 0.0% | 589 | 0/1 |
-| `xml` | 0.0% | 1,432 | 0/1 |
+| `csv` | 80.0% | 606 | 4/5 |
+| `xml` | 80.0% | 1,849 | 4/5 |
+| `toon` | 0.0% | 651 | 0/5 |
+| `json-pretty` | 0.0% | 1,338 | 0/5 |
+| `yaml` | 0.0% | 858 | 0/5 |
+| `json-compact` | 0.0% | 719 | 0/5 |
 
 ##### Extra rows added beyond declared length
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `toon` | 0.0% | 800 | 0/1 |
-| `json-compact` | 0.0% | 1,137 | 0/1 |
-| `json-pretty` | 0.0% | 1,678 | 0/1 |
-| `yaml` | 0.0% | 1,352 | 0/1 |
-| `csv` | 0.0% | 266 | 0/1 |
-| `xml` | 0.0% | 568 | 0/1 |
+| `csv` | 80.0% | 667 | 4/5 |
+| `toon` | 60.0% | 818 | 3/5 |
+| `xml` | 80.0% | 1,739 | 4/5 |
+| `json-compact` | 60.0% | 1,132 | 3/5 |
+| `yaml` | 60.0% | 1,364 | 3/5 |
+| `json-pretty` | 40.0% | 1,758 | 2/5 |
 
 ##### Inconsistent field count (missing salary in row 10)
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `toon` | 0.0% | 1,192 | 0/1 |
-| `json-compact` | 0.0% | 995 | 0/1 |
-| `json-pretty` | 0.0% | 1,447 | 0/1 |
-| `yaml` | 0.0% | 1,180 | 0/1 |
-| `csv` | 0.0% | 659 | 0/1 |
-| `xml` | 0.0% | 910 | 0/1 |
+| `csv` | 80.0% | 679 | 4/5 |
+| `json-compact` | 80.0% | 997 | 4/5 |
+| `yaml` | 80.0% | 1,196 | 4/5 |
+| `toon` | 80.0% | 1,220 | 4/5 |
+| `json-pretty` | 80.0% | 1,535 | 4/5 |
+| `xml` | 80.0% | 1,602 | 4/5 |
 
 ##### Missing required fields (no email in multiple rows)
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `toon` | 0.0% | 1,156 | 0/1 |
-| `json-compact` | 0.0% | 961 | 0/1 |
-| `json-pretty` | 0.0% | 1,395 | 0/1 |
-| `yaml` | 0.0% | 1,135 | 0/1 |
-| `csv` | 0.0% | 518 | 0/1 |
-| `xml` | 0.0% | 1,618 | 0/1 |
+| `csv` | 80.0% | 509 | 4/5 |
+| `xml` | 80.0% | 1,702 | 4/5 |
+| `toon` | 60.0% | 1,181 | 3/5 |
+| `json-pretty` | 40.0% | 1,486 | 2/5 |
+| `yaml` | 20.0% | 1,155 | 1/5 |
+| `json-compact` | 0.0% | 960 | 0/5 |
 
 #### Performance by Model
+
+##### claude-haiku-4-5-20251001
+
+| Format | Accuracy | Correct/Total |
+| ------ | -------- | ------------- |
+| `toon` | 59.8% | 125/209 |
+| `json-pretty` | 57.4% | 120/209 |
+| `yaml` | 56.0% | 117/209 |
+| `xml` | 55.5% | 116/209 |
+| `json-compact` | 55.0% | 115/209 |
+| `csv` | 50.5% | 55/109 |
+
+##### gemini-3-flash-preview
+
+| Format | Accuracy | Correct/Total |
+| ------ | -------- | ------------- |
+| `xml` | 98.1% | 205/209 |
+| `json-pretty` | 97.1% | 203/209 |
+| `yaml` | 97.1% | 203/209 |
+| `toon` | 96.7% | 202/209 |
+| `json-compact` | 96.7% | 202/209 |
+| `csv` | 96.3% | 105/109 |
+
+##### gpt-5-nano
+
+| Format | Accuracy | Correct/Total |
+| ------ | -------- | ------------- |
+| `toon` | 90.9% | 190/209 |
+| `json-compact` | 90.9% | 190/209 |
+| `json-pretty` | 89.0% | 186/209 |
+| `csv` | 89.0% | 97/109 |
+| `yaml` | 87.1% | 182/209 |
+| `xml` | 80.9% | 169/209 |
+
+##### grok-4-1-fast-non-reasoning
+
+| Format | Accuracy | Correct/Total |
+| ------ | -------- | ------------- |
+| `toon` | 58.4% | 122/209 |
+| `yaml` | 57.9% | 121/209 |
+| `json-pretty` | 56.5% | 118/209 |
+| `xml` | 54.1% | 113/209 |
+| `json-compact` | 52.2% | 109/209 |
+| `csv` | 51.4% | 56/109 |
 
 ##### GigaChat-2
 
@@ -270,13 +346,13 @@ Eleven datasets designed to test different structural patterns and validation ca
 
 #### Evaluation Process
 
-1. **Format conversion**: Each dataset is converted to all 6 formats (TOON, JSON compact, JSON, YAML, CSV, XML).
+1. **Format conversion**: Each dataset is converted to all 6 formats (TOON, JSON, YAML, JSON compact, CSV, XML).
 2. **Query LLM**: Each model receives formatted data + question in a prompt and extracts the answer.
 3. **Validate deterministically**: Answers are validated using type-aware comparison (e.g., `50000` = `$50,000`, `Engineering` = `engineering`, `2025-01-01` = `January 1, 2025`) without requiring an LLM judge.
 
 #### Models & Configuration
 
-- **Models tested**: `GigaChat-2`
+- **Models tested**: `claude-haiku-4-5-20251001`, `gemini-3-flash-preview`, `gpt-5-nano`, `grok-4-1-fast-non-reasoning`, `GigaChat-2`
 - **Token counting**: Using provider-reported prompt tokens (`inputTokens`) from model responses
 - **Temperature**: Not set (models use their defaults)
-- **Total evaluations**: 209 questions × 6 formats × 1 models = 1,254 LLM calls
+- **Total evaluations**: 209 questions × 6 formats × 5 models = 6,270 LLM calls
