@@ -1,4 +1,4 @@
-Benchmarks test LLM comprehension across different input formats using 209 data retrieval questions on 1 model.
+Benchmarks test LLM comprehension across different input formats using 2 data retrieval questions on 1 model.
 
 <details>
 <summary><strong>Show Dataset Catalog</strong></summary>
@@ -36,49 +36,45 @@ Benchmarks test LLM comprehension across different input formats using 209 data 
 Each format ranked by efficiency (accuracy percentage per 1,000 tokens):
 
 ```
-TOON           ████████████████████   27.8 acc%/1K tok  │  76.7% acc  │  2,759 tokens
-JSON compact   █████████████████░░░   23.8 acc%/1K tok  │  74.0% acc  │  3,104 tokens
-YAML           ██████████████░░░░░░   20.0 acc%/1K tok  │  74.8% acc  │  3,749 tokens
-JSON           ████████████░░░░░░░░   16.4 acc%/1K tok  │  75.2% acc  │  4,587 tokens
-XML            ██████████░░░░░░░░░░   13.9 acc%/1K tok  │  72.3% acc  │  5,221 tokens
+TOON           ████████████████████   38.4 acc%/1K tok  │  100.0% acc  │  2,605 tokens
+JSON compact   ███████████░░░░░░░░░   20.9 acc%/1K tok  │  100.0% acc  │  4,789 tokens
+YAML           █████████░░░░░░░░░░░   17.5 acc%/1K tok  │  100.0% acc  │  5,727 tokens
+JSON           ███████░░░░░░░░░░░░░   14.1 acc%/1K tok  │  100.0% acc  │  7,096 tokens
+XML            ██████░░░░░░░░░░░░░░   12.3 acc%/1K tok  │  100.0% acc  │  8,101 tokens
 ```
 
 *Efficiency score = (Accuracy % ÷ Tokens) × 1,000. Higher is better.*
 
 > [!TIP]
-> TOON achieves **76.7%** accuracy (vs JSON's 75.2%) while using **39.9% fewer tokens**.
+> TOON achieves **100.0%** accuracy (vs JSON's 100.0%) while using **63.3% fewer tokens**.
 
-**Note on CSV:** Excluded from ranking as it only supports 446 of 209 questions (flat tabular data only). While CSV is highly token-efficient for simple tabular data, it cannot represent nested structures that other formats handle.
+**Note on CSV:** Excluded from ranking as it only supports 2 of 2 questions (flat tabular data only). While CSV is highly token-efficient for simple tabular data, it cannot represent nested structures that other formats handle.
 
 #### Per-Model Accuracy
 
-Accuracy across 1 LLM on 209 data retrieval questions:
+Accuracy across 1 LLM on 2 data retrieval questions:
 
 ```
-GigaChat
-→ TOON           ████████████████████   100.0% (10/10)
-  YAML           ████████████████████   100.0% (10/10)
-  JSON compact   ████████████████████   100.0% (10/10)
-  CSV            ████████████████████   100.0% (10/10)
-  JSON           ██████████████████░░    90.0% (9/10)
-  XML            ██████████████████░░    90.0% (9/10)
+GigaChat-2
+  JSON           ████████████████████   100.0% (2/2)
+  JSON compact   ████████████████████   100.0% (2/2)
+→ TOON           ████████████████████   100.0% (2/2)
+  CSV            ████████████████████   100.0% (2/2)
+  XML            ████████████████████   100.0% (2/2)
+  YAML           ████████████████████   100.0% (2/2)
 ```
 
 > [!TIP]
-> TOON achieves **76.7% accuracy** (vs JSON's 75.2%) while using **39.9% fewer tokens** on these datasets.
+> TOON achieves **100.0% accuracy** (vs JSON's 100.0%) while using **63.3% fewer tokens** on these datasets.
 
 <details>
 <summary><strong>Performance by dataset, model, and question type</strong></summary>
 
 #### Performance by Question Type
 
-| Question Type | TOON | JSON | YAML | JSON compact | CSV | XML |
+| Question Type | JSON | JSON compact | TOON | CSV | XML | YAML |
 | ------------- | ---- | ---- | ---- | ---- | ---- | ---- |
-| Field Retrieval | 99.6% | 98.9% | 98.6% | 98.6% | 100.0% | 98.6% |
-| Aggregation | 61.9% | 61.9% | 59.9% | 58.3% | 50.9% | 54.4% |
-| Filtering | 56.8% | 53.1% | 56.3% | 55.2% | 50.9% | 51.6% |
-| Structure Awareness | 89.0% | 87.0% | 84.0% | 84.0% | 85.9% | 81.0% |
-| Structural Validation | 70.0% | 60.0% | 60.0% | 55.0% | 80.0% | 85.0% |
+| Field Retrieval | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
 
 #### Performance by Dataset
 
@@ -86,132 +82,25 @@ GigaChat
 
 | Format | Accuracy | Tokens | Correct/Total |
 | ------ | -------- | ------ | ------------- |
-| `csv` | 74.7% | 2,334 | 130/174 |
-| `toon` | 74.7% | 2,498 | 130/174 |
-| `json-compact` | 75.3% | 3,924 | 131/174 |
-| `yaml` | 75.3% | 4,959 | 131/174 |
-| `json-pretty` | 74.7% | 6,331 | 130/174 |
-| `xml` | 75.3% | 7,296 | 131/174 |
-
-##### E-commerce orders with nested structures
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `toon` | 82.3% | 7,458 | 135/164 |
-| `json-compact` | 78.7% | 7,110 | 129/164 |
-| `yaml` | 79.9% | 8,755 | 131/164 |
-| `json-pretty` | 79.3% | 11,234 | 130/164 |
-| `xml` | 77.4% | 12,649 | 127/164 |
-
-##### Time-series analytics data
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `csv` | 75.0% | 1,411 | 90/120 |
-| `toon` | 78.3% | 1,553 | 94/120 |
-| `json-compact` | 74.2% | 2,354 | 89/120 |
-| `yaml` | 75.8% | 2,954 | 91/120 |
-| `json-pretty` | 75.0% | 3,681 | 90/120 |
-| `xml` | 72.5% | 4,389 | 87/120 |
-
-##### Top 100 GitHub repositories
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `csv` | 65.9% | 8,527 | 87/132 |
-| `toon` | 66.7% | 8,779 | 88/132 |
-| `yaml` | 65.2% | 13,141 | 86/132 |
-| `json-compact` | 59.8% | 11,464 | 79/132 |
-| `json-pretty` | 63.6% | 15,157 | 84/132 |
-| `xml` | 56.1% | 17,105 | 74/132 |
-
-##### Semi-uniform event logs
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `json-compact` | 68.3% | 4,839 | 82/120 |
-| `toon` | 65.0% | 5,819 | 78/120 |
-| `json-pretty` | 69.2% | 6,817 | 83/120 |
-| `yaml` | 61.7% | 5,847 | 74/120 |
-| `xml` | 58.3% | 7,729 | 70/120 |
-
-##### Deeply nested configuration
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `json-compact` | 90.5% | 568 | 105/116 |
-| `toon` | 94.8% | 655 | 110/116 |
-| `yaml` | 93.1% | 675 | 108/116 |
-| `json-pretty` | 92.2% | 924 | 107/116 |
-| `xml` | 91.4% | 1,013 | 106/116 |
-
-##### Valid complete dataset (control)
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `toon` | 100.0% | 535 | 4/4 |
-| `json-compact` | 100.0% | 787 | 4/4 |
-| `yaml` | 100.0% | 992 | 4/4 |
-| `json-pretty` | 100.0% | 1,274 | 4/4 |
-| `xml` | 25.0% | 1,462 | 1/4 |
-| `csv` | 0.0% | 483 | 0/4 |
-
-##### Array truncated: 3 rows removed from end
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `csv` | 100.0% | 413 | 4/4 |
-| `xml` | 100.0% | 1,243 | 4/4 |
-| `toon` | 0.0% | 462 | 0/4 |
-| `json-pretty` | 0.0% | 1,085 | 0/4 |
-| `yaml` | 0.0% | 843 | 0/4 |
-| `json-compact` | 0.0% | 670 | 0/4 |
-
-##### Extra rows added beyond declared length
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `csv` | 100.0% | 550 | 4/4 |
-| `toon` | 75.0% | 605 | 3/4 |
-| `json-compact` | 75.0% | 901 | 3/4 |
-| `xml` | 100.0% | 1,678 | 4/4 |
-| `yaml` | 75.0% | 1,138 | 3/4 |
-| `json-pretty` | 50.0% | 1,460 | 2/4 |
-
-##### Inconsistent field count (missing salary in row 10)
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `csv` | 100.0% | 480 | 4/4 |
-| `json-compact` | 100.0% | 782 | 4/4 |
-| `yaml` | 100.0% | 985 | 4/4 |
-| `toon` | 100.0% | 1,008 | 4/4 |
-| `json-pretty` | 100.0% | 1,266 | 4/4 |
-| `xml` | 100.0% | 1,453 | 4/4 |
-
-##### Missing required fields (no email in multiple rows)
-
-| Format | Accuracy | Tokens | Correct/Total |
-| ------ | -------- | ------ | ------------- |
-| `csv` | 100.0% | 340 | 4/4 |
-| `xml` | 100.0% | 1,409 | 4/4 |
-| `toon` | 75.0% | 974 | 3/4 |
-| `json-pretty` | 50.0% | 1,225 | 2/4 |
-| `yaml` | 25.0% | 951 | 1/4 |
-| `json-compact` | 0.0% | 750 | 0/4 |
+| `toon` | 100.0% | 2,605 | 2/2 |
+| `csv` | 100.0% | 3,084 | 2/2 |
+| `json-compact` | 100.0% | 4,789 | 2/2 |
+| `yaml` | 100.0% | 5,727 | 2/2 |
+| `json-pretty` | 100.0% | 7,096 | 2/2 |
+| `xml` | 100.0% | 8,101 | 2/2 |
 
 #### Performance by Model
 
-##### GigaChat
+##### GigaChat-2
 
 | Format | Accuracy | Correct/Total |
 | ------ | -------- | ------------- |
-| `toon` | 100.0% | 10/10 |
-| `yaml` | 100.0% | 10/10 |
-| `json-compact` | 100.0% | 10/10 |
-| `csv` | 100.0% | 10/10 |
-| `json-pretty` | 90.0% | 9/10 |
-| `xml` | 90.0% | 9/10 |
+| `json-pretty` | 100.0% | 2/2 |
+| `json-compact` | 100.0% | 2/2 |
+| `toon` | 100.0% | 2/2 |
+| `csv` | 100.0% | 2/2 |
+| `xml` | 100.0% | 2/2 |
+| `yaml` | 100.0% | 2/2 |
 
 </details>
 
@@ -242,41 +131,41 @@ Eleven datasets designed to test different structural patterns and validation ca
 
 #### Question Types
 
-209 questions are generated dynamically across five categories:
+2 questions are generated dynamically across five categories:
 
-- **Field retrieval (33%)**: Direct value lookups or values that can be read straight off a record (including booleans and simple counts such as array lengths)
+- **Field retrieval (3400%)**: Direct value lookups or values that can be read straight off a record (including booleans and simple counts such as array lengths)
   - Example: "What is Alice's salary?" → `75000`
   - Example: "How many items are in order ORD-0042?" → `3`
   - Example: "What is the customer name for order ORD-0042?" → `John Doe`
 
-- **Aggregation (30%)**: Dataset-level totals and averages plus single-condition filters (counts, sums, min/max comparisons)
+- **Aggregation (3150%)**: Dataset-level totals and averages plus single-condition filters (counts, sums, min/max comparisons)
   - Example: "How many employees work in Engineering?" → `17`
   - Example: "What is the total revenue across all orders?" → `45123.50`
   - Example: "How many employees have salary > 80000?" → `23`
 
-- **Filtering (23%)**: Multi-condition queries requiring compound logic (AND constraints across fields)
+- **Filtering (2400%)**: Multi-condition queries requiring compound logic (AND constraints across fields)
   - Example: "How many employees in Sales have salary > 80000?" → `5`
   - Example: "How many active employees have more than 10 years of experience?" → `8`
 
-- **Structure awareness (12%)**: Tests format-native structural affordances (TOON's `[N]` count and `{fields}`, CSV's header row)
+- **Structure awareness (1250%)**: Tests format-native structural affordances (TOON's `[N]` count and `{fields}`, CSV's header row)
   - Example: "How many employees are in the dataset?" → `100`
   - Example: "List the field names for employees" → `id, name, email, department, salary, yearsExperience, active`
   - Example: "What is the department of the last employee?" → `Sales`
 
-- **Structural validation (2%)**: Tests ability to detect incomplete, truncated, or corrupted data using structural metadata
+- **Structural validation (250%)**: Tests ability to detect incomplete, truncated, or corrupted data using structural metadata
   - Example: "Is this data complete and valid?" → `YES` (control dataset) or `NO` (corrupted datasets)
   - Tests TOON's `[N]` length validation and `{fields}` consistency checking
   - Demonstrates CSV's lack of structural validation capabilities
 
 #### Evaluation Process
 
-1. **Format conversion**: Each dataset is converted to all 6 formats (TOON, JSON, YAML, JSON compact, CSV, XML).
+1. **Format conversion**: Each dataset is converted to all 6 formats (JSON, JSON compact, TOON, CSV, XML, YAML).
 2. **Query LLM**: Each model receives formatted data + question in a prompt and extracts the answer.
 3. **Validate deterministically**: Answers are validated using type-aware comparison (e.g., `50000` = `$50,000`, `Engineering` = `engineering`, `2025-01-01` = `January 1, 2025`) without requiring an LLM judge.
 
 #### Models & Configuration
 
-- **Models tested**: `GigaChat`
-- **Token counting**: Using `gpt-tokenizer` with `o200k_base` encoding (GPT-5 tokenizer)
+- **Models tested**: `GigaChat-2`
+- **Token counting**: Using provider-reported prompt tokens (`inputTokens`) from model responses
 - **Temperature**: Not set (models use their defaults)
-- **Total evaluations**: 209 questions × 6 formats × 1 models = 1,254 LLM calls
+- **Total evaluations**: 2 questions × 6 formats × 1 models = 12 LLM calls

@@ -1,5 +1,4 @@
 import * as fsp from 'node:fs/promises'
-import { encode } from 'gpt-tokenizer'
 
 /**
  * Generate visual progress bar using ASCII characters
@@ -26,19 +25,6 @@ export function createProgressBar(
   const filled = Math.round((value / max) * width)
   const empty = width - filled
   return chars.filled.repeat(filled) + chars.empty.repeat(empty)
-}
-
-/**
- * Count tokens in text using gpt-tokenizer (o200k_base encoding)
- *
- * @param text - Text to tokenize
- * @returns Number of tokens
- *
- * @example
- * tokenize("Hello, world!") // 4
- */
-export function tokenize(text: string): number {
-  return encode(text).length
 }
 
 /**

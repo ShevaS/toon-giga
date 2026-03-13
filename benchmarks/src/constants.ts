@@ -22,7 +22,7 @@ export const DRY_RUN: boolean = process.env.DRY_RUN === 'true'
  */
 export const DRY_RUN_LIMITS = {
   /** Maximum number of questions to evaluate */
-  maxQuestions: 10,
+  maxQuestions: 2,
 }
 
 /**

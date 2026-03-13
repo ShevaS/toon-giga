@@ -1,7 +1,9 @@
 import type { Question } from '../src/types.ts'
+import { execFile } from 'node:child_process'
 import * as fsp from 'node:fs/promises'
 import * as path from 'node:path'
 import process from 'node:process'
+import { promisify } from 'node:util'
 import * as prompts from '@clack/prompts'
 import PQueue from 'p-queue'
 import { BENCHMARKS_DIR, DEFAULT_CONCURRENCY, DRY_RUN, DRY_RUN_LIMITS, MODEL_RPM_LIMITS, ROOT_DIR } from '../src/constants.ts'
@@ -16,6 +18,7 @@ import { ensureDir } from '../src/utils.ts'
 // Constants
 const PROGRESS_UPDATE_INTERVAL = 10
 const RATE_LIMIT_INTERVAL_MS = 60_000
+const execFileAsync = promisify(execFile)
 
 prompts.intro('Retrieval Accuracy Benchmark')
 
@@ -213,3 +216,24 @@ await fsp.writeFile(outputFilePath, accuracyReport)
 
 reportSpinner.stop('Report generation complete!')
 prompts.log.info(`Report saved to: \`${path.relative(ROOT_DIR, outputFilePath)}\``)
+
+if (DRY_RUN) {
+  prompts.log.info('Skipping token-efficiency report in dry run mode')
+}
+else {
+  const tokenReportSpinner = prompts.spinner()
+  tokenReportSpinner.start('Generating token-efficiency report from saved accuracy results')
+
+  try {
+    await execFileAsync(process.execPath, ['scripts/token-efficiency-benchmark.ts'], {
+      cwd: BENCHMARKS_DIR,
+      env: process.env,
+    })
+    tokenReportSpinner.stop('Token-efficiency report generation complete!')
+  }
+  catch (error) {
+    tokenReportSpinner.stop('Token-efficiency report generation failed')
+    prompts.log.error(error instanceof Error ? error.message : String(error))
+    process.exit(1)
+  }
+}

@@ -44,7 +44,7 @@ const GITHUB_REPO_LIMIT = 3
 const GITHUB_DESC_LIMIT = 80
 const ANALYTICS_METRICS_LIMIT = 5
 
-prompts.intro('Token Efficiency Benchmark')
+prompts.intro('Token Efficiency Report')
 
 /**
  * Format a comparison line showing savings vs TOON

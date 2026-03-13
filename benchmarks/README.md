@@ -8,16 +8,13 @@ Benchmarks measuring TOON's **token efficiency** and **retrieval accuracy** comp
 ## Quick Start
 
 ```bash
-# Run token efficiency benchmark
-pnpm benchmark:tokens
-
 # Run retrieval accuracy benchmark (requires API keys)
 pnpm benchmark:accuracy
 ```
 
-## Token Efficiency Benchmark
+## Token Efficiency Report
 
-Measures token count reduction across JSON, XML, YAML, CSV, and TOON:
+Token count reduction across JSON, XML, YAML, CSV, and TOON is derived from retrieval-accuracy results:
 
 1. Generate datasets (GitHub repos, analytics, orders)
 2. Convert to all formats (TOON, JSON, XML, YAML, CSV)
@@ -27,8 +24,12 @@ Measures token count reduction across JSON, XML, YAML, CSV, and TOON:
 > [!IMPORTANT]
 > Token efficiency now depends on previously saved retrieval accuracy results. Run `pnpm benchmark:accuracy` first for the models you want to compare.
 
+This report is generated automatically at the end of `pnpm benchmark:accuracy`.
+
+If you need to regenerate it from already-saved accuracy results without calling models again:
+
 ```bash
-pnpm benchmark:tokens
+pnpm report:tokens
 ```
 
 Results are saved to `results/token-efficiency.md`.
@@ -77,6 +78,7 @@ Running the script will:
 3. Show progress with rate limiting.
 4. Save results to `results/accuracy/models/{model-id}.json`.
 5. Generate report at `results/retrieval-accuracy.md`.
+6. Generate token report at `results/token-efficiency.md`.
 
 ### Configuration
 
@@ -91,7 +93,7 @@ Edit [`src/constants.ts`](./src/constants.ts) to adjust:
 ```
 scripts/
 ├── accuracy-benchmark.ts         # Retrieval accuracy benchmark
-├── token-efficiency-benchmark.ts # Token counting benchmark
+├── token-efficiency-benchmark.ts # Token report generation from saved accuracy results
 └── fetch-github-repos.ts         # Update GitHub dataset
 src/
 ├── constants.ts                  # Configuration
